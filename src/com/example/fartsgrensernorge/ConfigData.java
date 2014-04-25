@@ -39,6 +39,9 @@ public class ConfigData extends Activity {
 	Map<String, List<String>> laptopCollection;
 	ExpandableListView expListView;
 	boolean backpressed;
+	final String dataFilenameC = "datac.dat";
+	final String dataFilename = "datab.dat";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -260,7 +263,7 @@ public class ConfigData extends Activity {
 								System.out.println(Integer.toHexString(textfilebytes[i]));
 							}
 							System.out.println(textfilebytes[0]);
-							String filename = ze.getName();
+							//String filename = ze.getName();
 							byte[] bytes = baos.toByteArray();
 							// do something with 'filename' and 'bytes'...
 						}
@@ -286,6 +289,7 @@ public class ConfigData extends Activity {
 			}
 		}.start();
 
+		
 	}
 	private void createCollection() {
 		// preparing laptops collection(child)
@@ -297,20 +301,20 @@ public class ConfigData extends Activity {
 
 		laptopCollection = new LinkedHashMap<String, List<String>>();
 
-		for (String laptop : groupList) {
-			if (laptop.equals("Nord-Norge")) {
+		for (String fylke : groupList) {
+			if (fylke.equals("Nord-Norge")) {
 				loadChild(nordnorge);
-			} else if (laptop.equals("Trøndelag"))
+			} else if (fylke.equals("Trøndelag"))
 				loadChild(trondelag);
-			else if (laptop.equals("Vestlandet"))
+			else if (fylke.equals("Vestlandet"))
 				loadChild(vestlandet);
-			else if (laptop.equals("Østlandet"))
+			else if (fylke.equals("Østlandet"))
 				loadChild(ostlandet);
-			else if (laptop.equals("Sørlandet"))
+			else if (fylke.equals("Sørlandet"))
 				loadChild(sorlandet);
 
 
-			laptopCollection.put(laptop, childList);
+			laptopCollection.put(fylke, childList);
 		}
 	}
 

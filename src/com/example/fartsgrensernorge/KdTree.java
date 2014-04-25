@@ -1,10 +1,13 @@
 package com.example.fartsgrensernorge;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -348,7 +351,6 @@ public class KdTree<T extends KdTree.XYZPoint> {
 	protected static class EuclideanComparator implements Comparator<KdNode> {
 
 		private XYZPoint point = null;
-
 		public EuclideanComparator(XYZPoint point) {
 			this.point = point;
 		}
@@ -377,6 +379,8 @@ public class KdTree<T extends KdTree.XYZPoint> {
 		int itemNr = -1;	
 		final int NODE_SIZE = 2*4+4; //X(4 bytes) Y(4 bytes) data(4 bytes)
 		final static private String filename = "data.txt";
+		private boolean isExtracted [] = new boolean [7];
+
 		public KdNode(XYZPoint id, int itemNr, int depth) {
 			this.id = id;
 			this.itemNr = itemNr;
@@ -420,6 +424,11 @@ public class KdTree<T extends KdTree.XYZPoint> {
 					System.out.println("file does not exist");
 					return null;
 				}
+				int ancester = itemNr;
+				while(ancester > 7) 
+					ancester >>= 1;
+				//if(!isExtracted[ancester])
+				//	extract(ancester);
 				//System.out.println("file size: "+ file.length());
 				DataInputStream dis = new DataInputStream(new FileInputStream(file));
 
@@ -437,6 +446,7 @@ public class KdTree<T extends KdTree.XYZPoint> {
 				while(bytesSkiped < skipNrOfBytes){
 					bytesSkiped += dis.skip(skipNrOfBytes - bytesSkiped);
 				}
+				
 				//System.out.println("bytesSkiped: " + bytesSkiped + " of " + skipNrOfBytes);
 
 
@@ -476,6 +486,38 @@ public class KdTree<T extends KdTree.XYZPoint> {
 			}
 			return null;
 		}
+		private void extract(int ancester) throws IOException {
+
+			File file = new File(externalFilesDir, "datac"+ancester+".dat");
+
+			InputStream is = new FileInputStream(file);
+			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
+			try {
+				ZipEntry ze;
+				while ((ze = zis.getNextEntry()) != null) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					byte[] zipBuffer = new byte[1024];
+					int count;
+					while ((count = zis.read(zipBuffer)) != -1) {
+						baos.write(zipBuffer, 0, count);
+					}
+					byte []textfilebytes = baos.toByteArray();
+					for (int i = 0; i < textfilebytes.length; i++) {
+						System.out.println((char)textfilebytes[i]);
+						System.out.println(Integer.toHexString(textfilebytes[i]));
+					}
+					System.out.println(textfilebytes[0]);
+					//String filename = ze.getName();
+					byte[] bytes = baos.toByteArray();
+					// do something with 'filename' and 'bytes'...
+				}
+			} finally {
+				zis.close();
+			}
+
+			
+		}
+
 		int parentItemNr(int itemNr){
 			if(itemNr == 0)
 				return -1;
