@@ -3,9 +3,11 @@ package com.example.fartsgrensernorge;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -427,11 +429,11 @@ public class KdTree<T extends KdTree.XYZPoint> {
 				int ancester = itemNr;
 				while(ancester > 7) 
 					ancester >>= 1;
-				//if(!isExtracted[ancester])
-				//	extract(ancester);
+				if(!isExtracted[ancester])
+					extract(ancester);
 				//System.out.println("file size: "+ file.length());
 				DataInputStream dis = new DataInputStream(new FileInputStream(file));
-
+				
 				double a = -1, b = -1;
 				int skipNrOfBytes = (itemNr)*(NODE_SIZE);
 				//System.out.println("file length: " + file.length());
@@ -489,6 +491,7 @@ public class KdTree<T extends KdTree.XYZPoint> {
 		private void extract(int ancester) throws IOException {
 
 			File file = new File(externalFilesDir, "datac"+ancester+".dat");
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
 
 			InputStream is = new FileInputStream(file);
 			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
@@ -499,20 +502,13 @@ public class KdTree<T extends KdTree.XYZPoint> {
 					byte[] zipBuffer = new byte[1024];
 					int count;
 					while ((count = zis.read(zipBuffer)) != -1) {
-						baos.write(zipBuffer, 0, count);
+						dos.write(baos.toByteArray(),0,count);
 					}
-					byte []textfilebytes = baos.toByteArray();
-					for (int i = 0; i < textfilebytes.length; i++) {
-						System.out.println((char)textfilebytes[i]);
-						System.out.println(Integer.toHexString(textfilebytes[i]));
-					}
-					System.out.println(textfilebytes[0]);
-					//String filename = ze.getName();
-					byte[] bytes = baos.toByteArray();
-					// do something with 'filename' and 'bytes'...
+					
 				}
 			} finally {
 				zis.close();
+				dos.close();
 			}
 
 			
